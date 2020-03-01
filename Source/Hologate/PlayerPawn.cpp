@@ -78,6 +78,11 @@ void APlayerPawn::Tick(float DeltaTime)
 			FVector NewLocation = GetActorLocation() + (CurrentVelocity * DeltaTime);
 			SetActorLocation(NewLocation);
 		}
+
+		if (!RotationDirection.IsZero())
+		{
+			SetActorRotation(RotationDirection.Rotation());
+		}
 	}
 
 }
@@ -93,6 +98,9 @@ void APlayerPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	PlayerInputComponent->BindAxis("MoveX", this, &APlayerPawn::Move_XAxis);
 	PlayerInputComponent->BindAxis("MoveY", this, &APlayerPawn::Move_YAxis);
 
+	PlayerInputComponent->BindAxis("RotateX", this, &APlayerPawn::Rotate_XAxis);
+	PlayerInputComponent->BindAxis("RotateY", this, &APlayerPawn::Rotate_YAxis);
+
 }
 
 void APlayerPawn::Move_XAxis(float AxisValue)
@@ -105,6 +113,18 @@ void APlayerPawn::Move_YAxis(float AxisValue)
 {
 	// Move at 100 units per second right or left
 	CurrentVelocity.Y = FMath::Clamp(AxisValue, -1.0f, 1.0f) * 100.0f;
+}
+
+void APlayerPawn::Rotate_XAxis(float AxisValue)
+{
+	// Move at 100 units per second forward or backward
+	RotationDirection.X = FMath::Clamp(AxisValue, -1.0f, 1.0f);
+}
+
+void APlayerPawn::Rotate_YAxis(float AxisValue)
+{
+	// Move at 100 units per second right or left
+	RotationDirection.Y = FMath::Clamp(AxisValue, -1.0f, 1.0f);
 }
 
 void APlayerPawn::StartGrowing()
