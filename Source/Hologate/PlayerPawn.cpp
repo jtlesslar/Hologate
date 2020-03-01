@@ -14,25 +14,27 @@ APlayerPawn::APlayerPawn()
 	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	AutoPossessPlayer = EAutoReceiveInput::Player0;
-
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
 
 	//Create Camera and Visible Mesh for Pawn
 
-	UCameraComponent* OurCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("OurCamera"));
+	//UCameraComponent* OurCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("OurCamera"));
 
 	PlayerMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PlayerMesh"));
 
 	//Attach Camera to Pawn and offset/rotate
 
-	OurCamera->SetupAttachment(RootComponent);
+	/*OurCamera->SetupAttachment(RootComponent);
 
 	OurCamera->SetRelativeLocation(FVector(-250.0f, 0.0f, 250.0f));
 
 	OurCamera->SetRelativeRotation(FRotator(-45.0f, 0.0f, 0.0f));
-
+*/
 	PlayerMesh->SetupAttachment(RootComponent);
+
+	FireRate = 0.1f;
+	bCanFire = true;
+
 
 }
 
@@ -49,26 +51,23 @@ void APlayerPawn::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	{
-		float CurrentScale = PlayerMesh->GetComponentScale().X;
 		if (bGrowing)
 		{
-			// Grow to double size over the course of one second
-			CurrentScale += DeltaTime;
-
-			if (Projectile != NULL)
+			
+			if (bCanFire)
 			{
-				GetWorld()->SpawnActor<AProjectile>(Projectile, GetActorLocation(), GetActorRotation());
+			
+				if (Projectile != NULL)
+				{
+					//todo getworld var
+					FVector MuzzleOffset = FVector(80.0f, 0.0f, 50.0f);
+					GetWorld()->SpawnActor<AProjectile>(Projectile, GetActorLocation() + MuzzleOffset, GetActorRotation());
+					bCanFire = false;
+					GetWorld()->GetTimerManager().SetTimer(TimerHandle_ShotTimerExpired, this, &APlayerPawn::ShotTimerExpired, FireRate);
+				}
 			}
 
 		}
-		else
-		{
-			// Shrink half as fast as we grow
-			CurrentScale -= (DeltaTime * 0.5f);
-		}
-		// Make sure we never drop below our starting size, or increase past double size.
-		CurrentScale = FMath::Clamp(CurrentScale, 1.0f, 2.0f);
-		PlayerMesh->SetWorldScale3D(FVector(CurrentScale));
 	}
 
 	// Handle movement based on our "MoveX" and "MoveY" axes
@@ -85,6 +84,12 @@ void APlayerPawn::Tick(float DeltaTime)
 		}
 	}
 
+
+}
+
+void APlayerPawn::ShotTimerExpired()
+{
+	bCanFire = true;
 }
 
 // Called to bind functionality to input

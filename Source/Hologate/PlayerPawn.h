@@ -21,6 +21,11 @@ public:
 	UPROPERTY(EditAnywhere, Category = Projectile)
 		TSubclassOf<class AProjectile> Projectile;
 
+	/* How fast the weapon will fire */
+	UPROPERTY(Category = Gameplay, EditAnywhere, BlueprintReadWrite)
+		float FireRate;
+
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -44,5 +49,16 @@ public:
 	FVector CurrentVelocity;
 	FVector RotationDirection;
 	bool bGrowing;
+
+	/* Handler for the fire timer expiry */
+	void ShotTimerExpired();
+
+private :
+
+	/* Flag to control firing  */
+	uint32 bCanFire : 1;
+
+	/** Handle for efficient management of ShotTimerExpired timer */
+	FTimerHandle TimerHandle_ShotTimerExpired;
 
 };

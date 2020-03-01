@@ -22,6 +22,9 @@ class HOLOGATE_API AProjectile : public AActor
 	UPROPERTY(EditAnywhere, Category = Projectile)
 		class AActor* CharacterActor;
 
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
 
 public:	
 	// Sets default values for this actor's properties
