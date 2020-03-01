@@ -2,6 +2,7 @@
 
 
 #include "PlayerPawn.h"
+#include "Projectile.h"
 
 #include "Camera/CameraComponent.h"
 #include "Components/StaticMeshComponent.h"
@@ -21,7 +22,7 @@ APlayerPawn::APlayerPawn()
 
 	UCameraComponent* OurCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("OurCamera"));
 
-	OurVisibleComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("OurVisibleComponent"));
+	PlayerMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PlayerMesh"));
 
 	//Attach Camera to Pawn and offset/rotate
 
@@ -31,7 +32,7 @@ APlayerPawn::APlayerPawn()
 
 	OurCamera->SetRelativeRotation(FRotator(-45.0f, 0.0f, 0.0f));
 
-	OurVisibleComponent->SetupAttachment(RootComponent);
+	PlayerMesh->SetupAttachment(RootComponent);
 
 }
 
@@ -48,11 +49,17 @@ void APlayerPawn::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	{
-		float CurrentScale = OurVisibleComponent->GetComponentScale().X;
+		float CurrentScale = PlayerMesh->GetComponentScale().X;
 		if (bGrowing)
 		{
 			// Grow to double size over the course of one second
 			CurrentScale += DeltaTime;
+
+			if (Projectile != NULL)
+			{
+				GetWorld()->SpawnActor<AProjectile>(Projectile, GetActorLocation(), GetActorRotation());
+			}
+
 		}
 		else
 		{
@@ -61,7 +68,7 @@ void APlayerPawn::Tick(float DeltaTime)
 		}
 		// Make sure we never drop below our starting size, or increase past double size.
 		CurrentScale = FMath::Clamp(CurrentScale, 1.0f, 2.0f);
-		OurVisibleComponent->SetWorldScale3D(FVector(CurrentScale));
+		PlayerMesh->SetWorldScale3D(FVector(CurrentScale));
 	}
 
 	// Handle movement based on our "MoveX" and "MoveY" axes
@@ -102,7 +109,7 @@ void APlayerPawn::Move_YAxis(float AxisValue)
 
 void APlayerPawn::StartGrowing()
 {
-	bGrowing = true;
+	bGrowing = true;		
 }
 
 void APlayerPawn::StopGrowing()

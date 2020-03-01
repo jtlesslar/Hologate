@@ -15,6 +15,12 @@ public:
 	// Sets default values for this pawn's properties
 	APlayerPawn();
 
+	UPROPERTY(EditAnywhere)
+		USceneComponent* PlayerMesh;
+
+	UPROPERTY(EditAnywhere, Category = Projectile)
+		TSubclassOf<class AProjectile> Projectile;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -25,9 +31,6 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-	UPROPERTY(EditAnywhere)
-	USceneComponent* OurVisibleComponent;
 
 	//Input functions
 	void Move_XAxis(float AxisValue);
