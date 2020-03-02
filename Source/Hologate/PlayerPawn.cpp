@@ -46,33 +46,13 @@ void APlayerPawn::BeginPlay()
 
 	StartingLocation = GetActorLocation();
 	StartingRotation = GetActorRotation();
-
+	
 }
 
 // Called every frame
 void APlayerPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	{
-		if (bGrowing)
-		{
-			
-			if (bCanFire)
-			{
-			
-				if (Projectile != NULL)
-				{
-					//todo getworld var
-					FVector MuzzleOffset = FVector(80.0f, 0.0f, 50.0f);
-					GetWorld()->SpawnActor<AProjectile>(Projectile, GetActorLocation() + MuzzleOffset, GetActorRotation());
-					bCanFire = false;
-					GetWorld()->GetTimerManager().SetTimer(TimerHandle_ShotTimerExpired, this, &APlayerPawn::ShotTimerExpired, FireRate);
-				}
-			}
-
-		}
-	}
 
 	// Handle movement based on our "MoveX" and "MoveY" axes
 	{
@@ -85,6 +65,26 @@ void APlayerPawn::Tick(float DeltaTime)
 		if (!RotationDirection.IsZero())
 		{
 			SetActorRotation(RotationDirection.Rotation());
+		}
+	}
+
+	{
+		if (bGrowing)
+		{
+
+			if (bCanFire)
+			{
+
+				if (Projectile != NULL)
+				{
+					//todo getworld var
+					FVector MuzzleOffset = (GetActorForwardVector() * 90.0f) + FVector(0.0f, 0.0f, 50.0f);
+					GetWorld()->SpawnActor<AProjectile>(Projectile, GetActorLocation() + MuzzleOffset, GetActorRotation());
+					bCanFire = false;
+					GetWorld()->GetTimerManager().SetTimer(TimerHandle_ShotTimerExpired, this, &APlayerPawn::ShotTimerExpired, FireRate);
+				}
+			}
+
 		}
 	}
 
@@ -140,13 +140,13 @@ void APlayerPawn::Move_YAxis(float AxisValue)
 
 void APlayerPawn::Rotate_XAxis(float AxisValue)
 {
-	// Move at 100 units per second forward or backward
+	
 	RotationDirection.X = FMath::Clamp(AxisValue, -1.0f, 1.0f);
 }
 
 void APlayerPawn::Rotate_YAxis(float AxisValue)
 {
-	// Move at 100 units per second right or left
+	
 	RotationDirection.Y = FMath::Clamp(AxisValue, -1.0f, 1.0f);
 }
 
