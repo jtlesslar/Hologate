@@ -5,6 +5,9 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/SphereComponent.h"
 
+#include "Engine/Engine.h"
+#include "PlayerPawn.h"
+
 
 // Sets default values
 AProjectile::AProjectile()
@@ -49,16 +52,23 @@ void AProjectile::BeginPlay()
 
 void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	UE_LOG(LogTemp, Warning, TEXT("COLLISION %s"), *OtherActor->GetName());
-
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("I JUST HIT %s "), *OtherActor->GetName()));
-
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("I JUST HIT %s "), *OtherActor->GetName()));
+	/*GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, FString::Printf(TEXT("I JUST HIT %s "), *OtherActor->GetOwner()->GetName()));*/
 	
-
 	// Only add impulse and destroy projectile if we hit a physics
-	if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && OtherComp->IsSimulatingPhysics())
+	if ((OtherActor != NULL) && 
+		(OtherActor != this) && 
+		(OtherActor->IsA(APlayerPawn::StaticClass())))
 	{
-		// OtherComp->AddImpulseAtLocation(GetVelocity() * 100.0f, GetActorLocation());
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("I JUST HIT %s "), *OtherActor->GetName()));
+		
+		APlayerPawn* HitPlayer = Cast<APlayerPawn>(OtherActor);
+
+		if (HitPlayer != NULL)
+		{
+			HitPlayer->PlayerHit();
+		}
+		
 
 		Destroy();
 	}

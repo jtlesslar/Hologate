@@ -53,12 +53,16 @@ public:
 	/* Handler for the fire timer expiry */
 	void ShotTimerExpired();
 
+	void PlayerHit();
+
 private :
 
 	/* Flag to control firing  */
-	uint32 bCanFire : 1;
+	bool bCanFire;
 
 	/** Handle for efficient management of ShotTimerExpired timer */
 	FTimerHandle TimerHandle_ShotTimerExpired;
+
+	int32 Health;
 
 };

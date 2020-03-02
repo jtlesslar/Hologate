@@ -34,6 +34,7 @@ APlayerPawn::APlayerPawn()
 
 	FireRate = 0.1f;
 	bCanFire = true;
+	Health = 100;
 
 
 }
@@ -90,6 +91,18 @@ void APlayerPawn::Tick(float DeltaTime)
 void APlayerPawn::ShotTimerExpired()
 {
 	bCanFire = true;
+}
+
+void APlayerPawn::PlayerHit()
+{
+	Health -= 20;
+
+	if (Health <= 0)
+	{
+		Health = 0;
+		Destroy();
+	}
+
 }
 
 // Called to bind functionality to input
