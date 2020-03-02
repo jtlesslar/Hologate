@@ -45,6 +45,8 @@ public:
 	void StartGrowing();
 	void StopGrowing();
 
+	virtual UPawnMovementComponent* GetMovementComponent() const override;
+
 	//Input variables
 	FVector CurrentVelocity;
 	FVector RotationDirection;
@@ -54,6 +56,8 @@ public:
 	void ShotTimerExpired();
 
 	void PlayerHit();
+
+	class UPlayerMovementComponent* OurMovementComponent;
 
 private :
 

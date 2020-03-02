@@ -7,6 +7,10 @@
 #include "Camera/CameraComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/InputComponent.h"
+#include <Components/SphereComponent.h>
+#include <UObject/ConstructorHelpers.h>
+#include "PlayerMovementComponent.h"
+#include <Kismet/GameplayStatics.h>
 
 // Sets default values
 APlayerPawn::APlayerPawn()
@@ -14,28 +18,44 @@ APlayerPawn::APlayerPawn()
 	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
+	// Our root component will be a sphere that reacts to physics
+	USphereComponent* SphereComponent = CreateDefaultSubobject<USphereComponent>(TEXT("RootComponent"));
+	RootComponent = SphereComponent;
+	SphereComponent->InitSphereRadius(40.0f);
+	SphereComponent->SetCollisionProfileName(TEXT("Pawn"));
 
-	//Create Camera and Visible Mesh for Pawn
+	// Create and position a mesh component so we can see where our sphere is
+	UStaticMeshComponent* SphereVisual = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("VisualRepresentation"));
+	SphereVisual->SetupAttachment(RootComponent);
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> SphereVisualAsset(TEXT("/Game/StarterContent/Shapes/Shape_Sphere.Shape_Sphere"));
+	if (SphereVisualAsset.Succeeded())
+	{
+		SphereVisual->SetStaticMesh(SphereVisualAsset.Object);
+		SphereVisual->SetRelativeLocation(FVector(0.0f, 0.0f, -40.0f));
+		SphereVisual->SetWorldScale3D(FVector(0.8f));
+		
+	}
 
-	//UCameraComponent* OurCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("OurCamera"));
+	UStaticMeshComponent* WaeponVisual = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("WeaponRepresentation"));
+	WaeponVisual->SetupAttachment(RootComponent);
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> WaeponVisualAsset(TEXT("/Game/StarterContent/Shapes/Shape_Cube.Shape_Cube"));
+	if (WaeponVisualAsset.Succeeded())
+	{
+		WaeponVisual->SetStaticMesh(WaeponVisualAsset.Object);
+		WaeponVisual->SetRelativeLocation(FVector(90.0f, 0.0f, 40.0f));
+		WaeponVisual->SetWorldScale3D(FVector(0.2f));
 
-	PlayerMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PlayerMesh"));
-
-	//Attach Camera to Pawn and offset/rotate
-
-	/*OurCamera->SetupAttachment(RootComponent);
-
-	OurCamera->SetRelativeLocation(FVector(-250.0f, 0.0f, 250.0f));
-
-	OurCamera->SetRelativeRotation(FRotator(-45.0f, 0.0f, 0.0f));
-*/
-	PlayerMesh->SetupAttachment(RootComponent);
+	}
 
 	FireRate = 0.1f;
 	bCanFire = true;
 	Health = 100;
 
+	// Create an instance of our movement component, and tell it to update the root.
+	OurMovementComponent = CreateDefaultSubobject<UPlayerMovementComponent>(TEXT("CustomMovementComponent"));
+	OurMovementComponent->UpdatedComponent = RootComponent;
+
+	UGameplayStatics::CreatePlayer(GetWorld());
 
 }
 
@@ -56,11 +76,22 @@ void APlayerPawn::Tick(float DeltaTime)
 
 	// Handle movement based on our "MoveX" and "MoveY" axes
 	{
-		if (!CurrentVelocity.IsZero())
+
+		//if (OurMovementComponent && 
+		//	(OurMovementComponent->UpdatedComponent == RootComponent) &&
+		if	(!CurrentVelocity.IsZero())
 		{
-			FVector NewLocation = GetActorLocation() + (CurrentVelocity * DeltaTime);
-			SetActorLocation(NewLocation);
+			OurMovementComponent->AddInputVector(CurrentVelocity* DeltaTime);
 		}
+
+		//if (!CurrentVelocity.IsZero())
+		//{
+		//	FVector NewLocation = GetActorLocation() + (CurrentVelocity * DeltaTime);
+		//	SetActorLocation(NewLocation);
+		//	
+		//	
+
+		//}
 
 		if (!RotationDirection.IsZero())
 		{
@@ -142,6 +173,7 @@ void APlayerPawn::Rotate_XAxis(float AxisValue)
 {
 	
 	RotationDirection.X = FMath::Clamp(AxisValue, -1.0f, 1.0f);
+
 }
 
 void APlayerPawn::Rotate_YAxis(float AxisValue)
@@ -160,3 +192,7 @@ void APlayerPawn::StopGrowing()
 	bGrowing = false;
 }
 
+UPawnMovementComponent* APlayerPawn::GetMovementComponent() const
+{
+	return OurMovementComponent;
+}
