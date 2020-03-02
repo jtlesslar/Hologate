@@ -7,7 +7,7 @@
 #include "Camera/CameraComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/InputComponent.h"
-#include <Components/SphereComponent.h>
+
 #include <UObject/ConstructorHelpers.h>
 #include "PlayerMovementComponent.h"
 #include <Kismet/GameplayStatics.h>
@@ -33,18 +33,25 @@ APlayerPawn::APlayerPawn()
 		SphereVisual->SetStaticMesh(SphereVisualAsset.Object);
 		SphereVisual->SetRelativeLocation(FVector(0.0f, 0.0f, -40.0f));
 		SphereVisual->SetWorldScale3D(FVector(0.8f));
-		
+	
+		PlayerMesh = SphereVisual;
 	}
 
-	UStaticMeshComponent* WaeponVisual = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("WeaponRepresentation"));
-	WaeponVisual->SetupAttachment(RootComponent);
+	// Players can't walk on it
+	SphereComponent->SetWalkableSlopeOverride(FWalkableSlopeOverride(WalkableSlope_Unwalkable, 0.f));
+	SphereComponent->CanCharacterStepUpOn = ECB_No;
+	
+
+	UStaticMeshComponent* WeaponVisual = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("WeaponRepresentation"));
+	WeaponVisual->SetupAttachment(RootComponent);
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> WaeponVisualAsset(TEXT("/Game/StarterContent/Shapes/Shape_Cube.Shape_Cube"));
 	if (WaeponVisualAsset.Succeeded())
 	{
-		WaeponVisual->SetStaticMesh(WaeponVisualAsset.Object);
-		WaeponVisual->SetRelativeLocation(FVector(60.0f, 0.0f, 30.0f));
-		WaeponVisual->SetWorldScale3D(FVector(0.2f));
-
+		WeaponVisual->SetStaticMesh(WaeponVisualAsset.Object);
+		WeaponVisual->SetRelativeLocation(FVector(60.0f, 0.0f, 30.0f));
+		WeaponVisual->SetWorldScale3D(FVector(0.2f));
+		
+		WeaponMesh = WeaponVisual;
 	}
 
 	FireRate = 0.1f;

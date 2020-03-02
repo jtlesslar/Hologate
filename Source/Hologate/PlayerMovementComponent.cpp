@@ -23,7 +23,7 @@ void UPlayerMovementComponent::TickComponent(float DeltaTime, enum ELevelTick Ti
 		// If we bumped into something, try to slide along it
 		if (Hit.IsValidBlockingHit())
 		{
-			SlideAlongSurface(DesiredMovementThisFrame, 1.f - Hit.Time, Hit.Normal, Hit);
+			SlideAlongSurface(DesiredMovementThisFrame, 1.f - Hit.Time, Hit.Normal.GetSafeNormal2D(), Hit);
 		}
 	}
 };

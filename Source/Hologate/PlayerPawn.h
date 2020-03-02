@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <Components/SphereComponent.h>
+
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 #include "PlayerPawn.generated.h"
@@ -17,6 +19,9 @@ public:
 
 	UPROPERTY(EditAnywhere)
 		USceneComponent* PlayerMesh;
+
+	UPROPERTY(EditAnywhere)
+		USceneComponent* WeaponMesh;
 
 	UPROPERTY(EditAnywhere, Category = Projectile)
 		TSubclassOf<class AProjectile> Projectile;
