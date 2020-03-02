@@ -42,7 +42,7 @@ APlayerPawn::APlayerPawn()
 	if (WaeponVisualAsset.Succeeded())
 	{
 		WaeponVisual->SetStaticMesh(WaeponVisualAsset.Object);
-		WaeponVisual->SetRelativeLocation(FVector(40.0f, 0.0f, 30.0f));
+		WaeponVisual->SetRelativeLocation(FVector(60.0f, 0.0f, 30.0f));
 		WaeponVisual->SetWorldScale3D(FVector(0.2f));
 
 	}
@@ -54,9 +54,7 @@ APlayerPawn::APlayerPawn()
 	// Create an instance of our movement component, and tell it to update the root.
 	OurMovementComponent = CreateDefaultSubobject<UPlayerMovementComponent>(TEXT("CustomMovementComponent"));
 	OurMovementComponent->UpdatedComponent = RootComponent;
-
-
-
+	   
 }
 
 // Called when the game starts or when spawned
@@ -65,9 +63,7 @@ void APlayerPawn::BeginPlay()
 	Super::BeginPlay();
 
 	UGameplayStatics::CreatePlayer((GetWorld()));
-
-
-
+	   
 	StartingLocation = GetActorLocation();
 	StartingRotation = GetActorRotation();
 	
@@ -140,7 +136,6 @@ void APlayerPawn::PlayerHit()
 		//todo respawn function
 		Health = 100;
 		SetActorLocationAndRotation(StartingLocation,StartingRotation);
-
 	}
 
 }
