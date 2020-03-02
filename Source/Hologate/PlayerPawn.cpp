@@ -42,7 +42,7 @@ APlayerPawn::APlayerPawn()
 	if (WaeponVisualAsset.Succeeded())
 	{
 		WaeponVisual->SetStaticMesh(WaeponVisualAsset.Object);
-		WaeponVisual->SetRelativeLocation(FVector(90.0f, 0.0f, 40.0f));
+		WaeponVisual->SetRelativeLocation(FVector(40.0f, 0.0f, 30.0f));
 		WaeponVisual->SetWorldScale3D(FVector(0.2f));
 
 	}
@@ -55,7 +55,7 @@ APlayerPawn::APlayerPawn()
 	OurMovementComponent = CreateDefaultSubobject<UPlayerMovementComponent>(TEXT("CustomMovementComponent"));
 	OurMovementComponent->UpdatedComponent = RootComponent;
 
-	UGameplayStatics::CreatePlayer(GetWorld());
+
 
 }
 
@@ -63,6 +63,10 @@ APlayerPawn::APlayerPawn()
 void APlayerPawn::BeginPlay()
 {
 	Super::BeginPlay();
+
+	UGameplayStatics::CreatePlayer((GetWorld()));
+
+
 
 	StartingLocation = GetActorLocation();
 	StartingRotation = GetActorRotation();
@@ -81,7 +85,7 @@ void APlayerPawn::Tick(float DeltaTime)
 		//	(OurMovementComponent->UpdatedComponent == RootComponent) &&
 		if	(!CurrentVelocity.IsZero())
 		{
-			OurMovementComponent->AddInputVector(CurrentVelocity* DeltaTime);
+			OurMovementComponent->AddInputVector(CurrentVelocity* DeltaTime* 100.0f);
 		}
 
 		//if (!CurrentVelocity.IsZero())
