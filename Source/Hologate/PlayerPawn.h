@@ -65,4 +65,7 @@ private :
 
 	int32 Health;
 
+	FVector StartingLocation;
+	FRotator StartingRotation;
+
 };

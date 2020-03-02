@@ -69,7 +69,6 @@ void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimi
 			HitPlayer->PlayerHit();
 		}
 		
-
 		Destroy();
 	}
 }

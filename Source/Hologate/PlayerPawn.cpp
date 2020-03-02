@@ -44,6 +44,9 @@ void APlayerPawn::BeginPlay()
 {
 	Super::BeginPlay();
 
+	StartingLocation = GetActorLocation();
+	StartingRotation = GetActorRotation();
+
 }
 
 // Called every frame
@@ -99,8 +102,10 @@ void APlayerPawn::PlayerHit()
 
 	if (Health <= 0)
 	{
-		Health = 0;
-		Destroy();
+		//todo respawn function
+		Health = 100;
+		SetActorLocationAndRotation(StartingLocation,StartingRotation);
+
 	}
 
 }
