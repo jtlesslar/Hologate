@@ -24,7 +24,7 @@ AProjectile::AProjectile()
 	RootComponent = SphereComponent;
 
 	SphereComponent->InitSphereRadius(15.0f);
-	SphereComponent->SetCollisionProfileName(TEXT("BlockAll"));
+	SphereComponent->SetCollisionProfileName(TEXT("Projectile"));
 
 	// set up a notification for when this component hits something blocking
 	SphereComponent->OnComponentHit.AddDynamic(this, &AProjectile::OnHit);		
@@ -77,16 +77,24 @@ void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimi
 {
 	// Check that actor exists and is of type PLayerPawn
 	if ((OtherActor != NULL) &&
-		(OtherActor != this) &&
-		(OtherActor->IsA(APlayerPawn::StaticClass())))
+		(OtherActor != this))
 	{
-		APlayerPawn* HitPlayer = Cast<APlayerPawn>(OtherActor);
-
-		if (HitPlayer != NULL)
+		if (OtherActor->IsA(APlayerPawn::StaticClass()))
 		{
-			HitPlayer->PlayerHit();
+			APlayerPawn* HitPlayer = Cast<APlayerPawn>(OtherActor);
+
+			if (HitPlayer != NULL)
+			{
+				HitPlayer->PlayerHit();
+			}
+			Destroy();
 		}
-	}
-	//Always Destroy on hitting blocking collider otherwise will stick and stack
-	Destroy();
+		//Always Destroy on hit to prevent sticking and stacking
+		//Apart from collisions with other projectiles
+		else if (!OtherActor->IsA(AProjectile::StaticClass()))
+		{
+			Destroy();
+		}
+		
+	}	
 }

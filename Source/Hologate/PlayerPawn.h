@@ -56,6 +56,7 @@ private :
 
 	//Flag to control when a shot can be fired (Fire Rate)  
 	bool bCanShoot;
+	bool bAlive;
 
 	//Handle for timer expiries
 	FTimerHandle TimerHandle_ShotTimerExpired;

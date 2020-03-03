@@ -75,8 +75,9 @@ APlayerPawn::APlayerPawn()
 	FireRate = FireRateDefault;
 	RespawnRate = RespawnRateDefault;
 	bCanShoot = true;
+	bAlive = true;
 	Health = FullHealth;
-	Projectile = AProjectile::StaticClass();
+	
 }
 
 // Called when the game starts or when spawned
@@ -91,6 +92,11 @@ void APlayerPawn::BeginPlay()
 	StartingLocation = GetActorLocation();
 	StartingRotation = GetActorRotation();
 	
+	if (Projectile == NULL)
+	{
+		Projectile = AProjectile::StaticClass();
+	}
+
 }
 
 // Called every frame
@@ -110,7 +116,7 @@ void APlayerPawn::Tick(float DeltaTime)
 		SetActorRotation(RotationDirection.Rotation());
 	}
 		
-	if (bShooting && bCanShoot)
+	if (bAlive && bShooting && bCanShoot)
 	{
 		if (Projectile != NULL)
 		{
@@ -118,7 +124,7 @@ void APlayerPawn::Tick(float DeltaTime)
 						
 			if (World)
 			{
-				FVector MuzzleOffset = (GetActorForwardVector() * 90.0f) + FVector(0.0f, 0.0f, 50.0f);
+				FVector MuzzleOffset = (GetActorForwardVector() * 90.0f) + FVector(0.0f, 0.0f, 30.0f);
 				World->SpawnActor<AProjectile>(Projectile, GetActorLocation() + MuzzleOffset, GetActorRotation());
 				bCanShoot = false;
 				World->GetTimerManager().SetTimer(TimerHandle_ShotTimerExpired, this, &APlayerPawn::ShotTimerExpired, FireRate);
@@ -139,6 +145,7 @@ void APlayerPawn::PlayerHit()
 
 	if (Health <= 0)
 	{
+		bAlive = false;
 		SetActorHiddenInGame(true);
 		SetActorEnableCollision(false);
 		GetWorld()->GetTimerManager().SetTimer(TimerHandle_RespawnTimerExpired, this, &APlayerPawn::Respawn, RespawnRate);
@@ -152,7 +159,8 @@ void APlayerPawn::Respawn()
 	
 	SetActorHiddenInGame(false);
 	SetActorEnableCollision(true);	
-	SetActorLocationAndRotation(StartingLocation, StartingRotation);	
+	SetActorLocationAndRotation(StartingLocation, StartingRotation);
+	bAlive = true;
 }
 
 // Called to bind functionality to input
