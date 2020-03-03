@@ -1,12 +1,12 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 #include "PlayerPawn.h"
-#include "Projectile.h"
 
 #include "Camera/CameraComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/InputComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "PlayerMovementComponent.h"
+#include "Projectile.h"
 
 #include <TimerManager.h>
 #include <UObject/ConstructorHelpers.h>
@@ -43,7 +43,6 @@ APlayerPawn::APlayerPawn()
 	{
 		SphereVisual->SetStaticMesh(SphereVisualAsset.Object);
 		SphereVisual->SetRelativeLocation(FVector(0.0f, 0.0f, -40.0f));
-		SphereVisual->SetWorldScale3D(FVector(0.8f));
 	
 		PlayerMesh = SphereVisual;
 	}
@@ -58,6 +57,13 @@ APlayerPawn::APlayerPawn()
 		WeaponVisual->SetRelativeLocation(FVector(60.0f, 0.0f, 30.0f));
 		WeaponVisual->SetWorldScale3D(FVector(0.2f));
 		
+		static ConstructorHelpers::FObjectFinder<UMaterialInterface> Material(TEXT("/Game/CustomMaterials/M_Black.M_Black"));
+
+		if (Material.Succeeded())
+		{
+			WeaponVisual->SetMaterial(0, Material.Object);
+		}
+
 		WeaponMesh = WeaponVisual;
 	}
 
@@ -70,6 +76,7 @@ APlayerPawn::APlayerPawn()
 	RespawnRate = RespawnRateDefault;
 	bCanShoot = true;
 	Health = FullHealth;
+	Projectile = AProjectile::StaticClass();
 }
 
 // Called when the game starts or when spawned
@@ -171,17 +178,17 @@ void APlayerPawn::Move_XAxis(float AxisValue)
 
 void APlayerPawn::Move_YAxis(float AxisValue)
 {
-	MovementDirection.Y = FMath::Clamp(AxisValue, -InputClampMin, InputClampMax);
+	MovementDirection.Y = FMath::Clamp(AxisValue, InputClampMin, InputClampMax);
 }
 
 void APlayerPawn::Rotate_XAxis(float AxisValue)
 {	
-	RotationDirection.X = FMath::Clamp(AxisValue, -InputClampMin, InputClampMax);
+	RotationDirection.X = FMath::Clamp(AxisValue, InputClampMin, InputClampMax);
 }
 
 void APlayerPawn::Rotate_YAxis(float AxisValue)
 {
-	RotationDirection.Y = FMath::Clamp(AxisValue, -InputClampMin, InputClampMax);
+	RotationDirection.Y = FMath::Clamp(AxisValue, InputClampMin, InputClampMax);
 }
 
 void APlayerPawn::StartShooting()

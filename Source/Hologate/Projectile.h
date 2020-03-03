@@ -11,32 +11,31 @@ class HOLOGATE_API AProjectile : public AActor
 {
 	GENERATED_BODY()
 	
-	/** Sphere collision component */
-	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
-	class USphereComponent* CollisionComp;
+public:
+	// Sets default values for this actor's properties
+	AProjectile();
 
-	/** Projectile movement component */
+	UPROPERTY(EditAnywhere, Category = Projectile)
+		class USphereComponent* SphereComponent;
+
+	UPROPERTY(EditAnywhere)
+		USceneComponent* ProjectileMesh;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
 		class UProjectileMovementComponent* ProjectileMovement;
 
-	UPROPERTY(EditAnywhere, Category = Projectile)
-		class AActor* CharacterActor;
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+		
+	FORCEINLINE class USphereComponent* GetCollisionComp() const { return SphereComponent; }
+	
+	FORCEINLINE class UProjectileMovementComponent* GetProjectileMovement() const { return ProjectileMovement; }
 
-public:	
-	// Sets default values for this actor's properties
-	AProjectile();
-
-	/** called when projectile hits something */
+private:
+	// called when projectile hits something 
 	UFUNCTION()
 		void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
-
-	/** Returns CollisionComp subobject **/
-	FORCEINLINE class USphereComponent* GetCollisionComp() const { return CollisionComp; }
-	/** Returns ProjectileMovement subobject **/
-	FORCEINLINE class UProjectileMovementComponent* GetProjectileMovement() const { return ProjectileMovement; }
 
 };
